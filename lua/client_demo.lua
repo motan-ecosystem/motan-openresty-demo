@@ -36,7 +36,7 @@ if type(res) == "table" then
 end
 res = res or "empty"
 ngx.say(table.concat({
-    ">>> Motan-Mesh-HTTP: \n------->"..sprint_r({os.getenv("MOTAN_ENV")}) .. sprint_r(ngx.var.MOTAN_ENV),
+    ">>> Motan-Mesh-HTTP: \n------->"..sprint_r(singletons.var["ENV_STR"]),
     http_method,
     "\n",
     res
