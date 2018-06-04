@@ -18,6 +18,7 @@ docker rm ${CONTAINER_NAME}
 docker run --name ${CONTAINER_NAME} \
 -e TZ=Asia/Shanghai \
 -p 80:9900 \
+-p 2234:2234 \
 -v ${BASE_DIR}/:/usr/local/openresty/site/lualib/motan-demo \
 -v ${BASE_DIR}/libs/libmotan_tools.so:/lib/libmotan_tools.so \
 -d ${IMAGE} /usr/local/openresty/bin/openresty -p /usr/local/openresty/site/lualib/motan-demo  -g "daemon off; error_log  logs/error.log  info;"

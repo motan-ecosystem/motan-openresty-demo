@@ -1,7 +1,6 @@
 version: '2'
 services:
-  motan-go:
-    build: .
+  motan-openresty:
     image: zhoujing/motan-openresty:0.0.1
     container_name: motan-openresty
     ports:
@@ -10,3 +9,6 @@ services:
     volumes:
       - ./:/usr/local/openresty/site/lualib/motan-demo
       - ./libs/libmotan_tools.so:/lib/libmotan_tools.so
+    command: /usr/local/openresty/bin/openresty -p /usr/local/openresty/site/lualib/motan-demo  -g "daemon off; error_log  logs/error.log  info;"
+    environment:
+      - MOTAN_ENV=production
