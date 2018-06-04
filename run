@@ -1,0 +1,23 @@
+#!/bin/sh
+
+### BEGIN ###
+# Author: idevz
+# Since: 2018/03/12
+# Description:       Run a Motan-OpenResty App from docker
+### END ###
+
+set -x
+BASE_DIR=$(dirname $(cd $(dirname "$0") && pwd -P)/$(basename "$0"))
+
+IMAGE=zhoujing/motan-openresty:0.0.1
+CONTAINER_NAME=motan-openresty
+
+docker stop ${CONTAINER_NAME}
+docker rm ${CONTAINER_NAME}
+
+docker run --name ${CONTAINER_NAME} \
+-e TZ=Asia/Shanghai \
+-p 80:9900 \
+-v ${BASE_DIR}/:/usr/local/openresty/site/lualib/motan-demo \
+-v ${BASE_DIR}/libs/libmotan_tools.so:/lib/libmotan_tools.so \
+-d ${IMAGE} /usr/local/openresty/bin/openresty -p /usr/local/openresty/site/lualib/motan-demo  -g "daemon off; error_log  logs/error.log  info;"

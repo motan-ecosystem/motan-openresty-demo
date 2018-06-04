@@ -1,0 +1,12 @@
+version: '2'
+services:
+  motan-go:
+    build: .
+    image: zhoujing/motan-openresty:0.0.1
+    container_name: motan-openresty
+    ports:
+      - '80:9900'
+      - '2234:2234'
+    volumes:
+      - ./:/usr/local/openresty/site/lualib/motan-demo
+      - ./libs/libmotan_tools.so:/lib/libmotan_tools.so
