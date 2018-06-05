@@ -61,7 +61,38 @@ docker pull zhoujing/motan-openresty
 
 ## 关键配置
 
-以下是一个 Motan-OpenResty 项目须关注的关键配置（详情请参考[更多](# 更多信息)）
+以下是一个 Motan-OpenResty 项目须关注的关键配置（详情请参考[更多](https://github.com/weibocom/motan-openresty)）
+
+### Nginx 配置文件
+
+Nginx 配置文件关注两个关键的点：
+
+1. nginx.conf 中 `lua_package_path` 和 `lua_package_cpath` 的设置保证了 Motan-OpenResty 和 应用两部分包的正常加载。
+2. motan-demo.conf 和 motan-stream-demo.conf 中，演示了在 OpenResty 的 HTTP 和 Stream 子系统中，Motan 的相关配置。
+
+关键配置：
+
+* `init_by_lua` 阶段初始化了 `motan`
+* `init_worker_by_lua` 阶段完成了 Motan Client 和 Server 端的初始化
+
+```bash
+├── conf
+│   ├── mime.types
+│   ├── motan-demo.conf                 # OpenResty Http 子系统配置实例（演示 Motan Client 的配置）
+│   ├── motan-stream-demo.conf          # OpenResty Stream 子系统配置实例（演示 Motan Server 通过 Stream 模块提供服务）
+│   └── nginx.conf                      # 默认的应用 Nginx 启动配置，主要初始化了环境变量已经 Lua 和 C Lib 的加载路径
+```
+
+### 应用配置 （不同的运行环境加载不同的配置，默认为 `production` 生产环境）
+
+应用配置关注以下四个关键点：
+
+1. `singletons`，是 Motan-OpenResty 用来在 LuaVM 范围共享一些配置、常规数据的表。
+2. `MOTAN_LUA_SERVICE_PERFIX` 是提供 RPC 服务的前缀设置，结合 `SERVICE_PATH` 的配置，比如在本示例中，`lua/motan-service/` 路径下面有个 `HelloWorldService` Service，那提供的服务便为 `com.weibo.motan.HelloWorldService`。
+3. `MOTAN_LUA_SERVICE_PERFIX` 和 `SERVICE_PATH` 一起组合的服务及本示例提供的服务（Server），相关的 Server 的配置在 `lua/motan-service/sys/MOTAN_SERVER_CONF` 文件中。
+4. 而 Client 所依赖的服务则在 `lua/motan-service/sys/MOTAN_CLIENT_CONF` 文件中配置。
+
+运行配置：
 
 ```lua
 local singletons = require "motan.singletons"
@@ -74,6 +105,26 @@ local sys_conf = {
         SERVICE_PATH = APP_ROOT .. "lua/motan-service",
     }
 return sys_conf
+```
+
+Server 配置 `lua/motan-service/sys/MOTAN_SERVER_CONF`
+
+```ini
+[motan.service.direct_helloworld_service]               # 关注这里配置是 `motan.service` 表示提供的服务
+port=2234
+host=127.0.0.1
+registry=direct-test-motan2
+path=com.weibo.motan.HelloWorldService
+basicRefer=example_base_service
+```
+
+Client 配置 `lua/motan-service/sys/MOTAN_CLIENT_CONF`
+
+```ini
+[motan.refer.direct_helloworld_service]                 # 关注这里配置是 `motan.refer` 表示依赖的服务
+path=com.weibo.motan.HelloWorldService
+registry=direct-test-motan2
+basicRefer=example_basic_ref
 ```
 
 # 更多信息
